@@ -1,0 +1,51 @@
+; RUN CONTROL
+integrator              =  md       ; Use molecular dynamics with a leapfrog algorithm
+dt                      =  0.002    ; 2 fs timestep
+nsteps                  =  500000   ; 500 000 steps * 2 fs = 1 ns simulation    
+nstcomm                 =  50       ; Remove centre of mass motion every 50 steps
+comm-mode               =  Angular  ; remove COM translation and rotation
+
+; OUTPUT CONTROL
+nstxout                 =  0 ; Do not write coordinates
+nstvout                 =  0 ; Do not write velocities
+nstfout                 =  0 ; Do not write forces
+nstlog                  =  500 ; Write energies to log file every 10 000 steps
+nstcalcenergy           =  50 ; Calculate energies every 50 steps
+nstenergy               =  50 ; Write energies to energy file every 50 steps
+nstxout-compressed      =  1000 ; Write compressed coordinates every 10 000 steps
+compressed-x-precision  =  1000 ; Compress coordinates with 1000 precisions
+
+; NEIGHBOUR SEARCHING
+pbc                      = no ; Don't use periodic boundary conditions; simulate a lone molecule in infinite vacuum
+cutoff-scheme            = group ; Generate a pair list for groups of atoms; required for vacuum simulations
+nstlist                  = 0 ; Only construct the neighbour list once, as the entire system fits in the cutoff
+ns-type                  = simple ; Don't bother with a neighbour search grid as the system is tiny
+rlist                    = 1.6 ; Construct the neighbour list with a cut-off of 1.6 nm (the entire system for toluene)
+
+; ELECTROSTATICS
+coulombtype              = Cut-off ; Ignore electrostatic interactions beyond a certain distance
+rcoulomb                 = 1.4 ; Ignore electrostatic interactions between atoms more than 1.4 nm apart
+coulomb-modifier         = Potential-shift ; Smoothly shift the electrostatic potential to zero at the cutoff (for consistency with water sims)
+
+; VAN DER WAALS
+vdwtype                  = Cut-off ; Ignore VDW interactions beyond a certain distance
+rvdw                     = 1.4 ; Ignore VDW interactions beyond 1.4 nm
+vdw-modifier             = Potential-shift ; Smoothly shift the VDW potential to zero at the cutoff
+
+; TEMPERATURE COUPLING
+tcoupl                  =  v-rescale ; Use the Bussi stochastic velocity rescaling thermostat
+tc-grps                 =  System ; Single thermostat for the toluene
+ref-t                   =  300 ; Target temperatures for protein and solvent
+tau-t                   =  0.1 ; Time constant for temperature coupling (ps)
+
+; PRESSURE COUPLING
+pcoupl                  =  No ; No pressure coupling as we're in a vacuum
+
+; BONDS
+constraints              = all-bonds ; Replace bonds with constraints to enable 2 fs time step
+
+; FREE ENERGY
+free-energy             =  yes ; This is a free energy calculation
+init-lambda             =  0.55
+sc-alpha                =  1.51 ; Use soft-cores to interpolate non-bonded parameters of states
+

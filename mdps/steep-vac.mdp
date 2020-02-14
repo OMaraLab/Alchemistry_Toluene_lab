@@ -1,0 +1,33 @@
+; RUN CONTROL
+integrator               = steep ; Perform energy minimisation with steepest descent algorithm
+nsteps                   = 200 ; run for 200 steps, then stop
+emtol                    = 100 ; Or stop when greatest force is less than 100 units
+emstep                   = 0.01 ; Default energy minimsation step size
+
+; OUTPUT CONTROL
+nstxout                  = 0 ; Do not write coordinates
+nstvout                  = 0 ; Do not write velocities
+nstfout                  = 0 ; Do not write forces
+nstlog                   = 100 ; Write energies to log file every 100 steps
+nstenergy                = 10 ; Write energies to energy file every 10 steps
+nstxout-compressed       = 0 ; Do not write compressed coordinates
+
+; NEIGHBOUR SEARCHING
+pbc                      = no ; Don't use periodic boundary conditions; simulate a lone molecule in infinite vacuum
+cutoff-scheme            = group ; Generate a pair list for groups of atoms; required for vacuum simulations
+nstlist                  = 0 ; Only construct the neighbour list once, as the entire system fits in the cutoff
+ns-type                  = simple ; Don't bother with a neighbour search grid as the system is tiny
+rlist                    = 1.6 ; Construct the neighbour list with a cut-off of 1.6 nm (the entire system for toluene)
+
+; ELECTROSTATICS
+coulombtype              = Cut-off ; Ignore electrostatic interactions beyond a certain distance
+rcoulomb                 = 1.4 ; Ignore electrostatic interactions between atoms more than 1.4 nm apart
+coulomb-modifier         = Potential-shift ; Smoothly shift the electrostatic potential to zero at the cutoff (for consistency with water sims)
+
+; VAN DER WAALS
+vdwtype                  = Cut-off ; Ignore VDW interactions beyond a certain distance
+rvdw                     = 1.4 ; Ignore VDW interactions beyond 1.4 nm
+vdw-modifier             = Potential-shift ; Smoothly shift the VDW potential to zero at the cutoff (for consistency with water sims)
+
+; BONDS
+constraints              = None ; Don't use constraints for energy minimisation

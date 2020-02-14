@@ -1,0 +1,52 @@
+; RUN CONTROL
+integrator              =  md       ; Use molecular dynamics with a leapfrog algorithm
+dt                      =  0.002    ; 2 fs timestep
+nsteps                  =  500000   ; 500 000 steps * 2 fs = 1 ns simulation
+nstcomm                 =  50       ; Remove centre of mass motion every 50 steps
+
+; OUTPUT CONTROL
+nstxout                 =  0 ; Do not write coordinates
+nstvout                 =  0 ; Do not write velocities
+nstfout                 =  0 ; Do not write forces
+nstlog                  =  500 ; Write energies to log file every 10 000 steps
+nstcalcenergy           =  50 ; Calculate energies every 50 steps
+nstenergy               =  50 ; Write energies to energy file every 50 steps
+nstxout-compressed      =  1000 ; Write compressed coordinates every 10 000 steps
+compressed-x-precision  =  1000 ; Compress coordinates with 1000 precisions
+
+; NEIGHBOUR SEARCHING
+pbc                      = xyz ; Use periodic boundary conditions in all directions
+cutoff-scheme            = verlet ; Use a Verlet pair list to choose neighbours
+verlet-buffer-tolerance  = 0.005 ; Adjust neighbourlist size to keep energy drift below 0.005 kJ/mol/ps
+
+; ELECTROSTATICS
+coulombtype              = Reaction-Field ; Use the Reaction Field method to calculate long-range coulomb interactions
+epsilon-rf               = 78 ; Dielectric constant (relative permittivity) beyond the cutoff; 78 for water at 300K
+rcoulomb                 = 1.4 ; Treat electrostatics as a reaction field beyond 1.4 nm
+coulomb-modifier         = Potential-shift ; Smoothly shift the electrostatic potential to zero at the cutoff
+
+; VAN DER WAALS
+vdwtype                  = Cut-off ; Ignore VDW interactions beyond a certain distance
+rvdw                     = 1.4 ; Ignore VDW interactions beyond 1.4 nm
+vdw-modifier             = Potential-shift ; Smoothly shift the VDW potential to zero at the cutoff
+
+; TEMPERATURE COUPLING
+tcoupl                  =  v-rescale ; Use the Bussi stochastic velocity rescaling thermostat
+tc-grps                 =  Protein SOL ; Thermostat the protein and solvent seperately to avoid unphysical heat flow from one to the other
+ref-t                   =  300 300 ; Target temperatures for protein and solvent
+tau-t                   =  0.1 0.1 ; Time constant for temperature coupling (ps)
+
+; PRESSURE COUPLING
+pcoupl                  =  Parrinello-Rahman ; Parrinello-Rahman barostat for data collection
+pcoupltype              =  isotropic ; Volume scaled equally in all directions
+tau-p                   =  1.0 ; Time constant for pressure coupling (ps)
+compressibility         =  4.5e-5 ; Compressibility of water at 1 atm and 300 K
+ref-p                   =  1.0 ; Target a pressure of 1 bar
+
+; BONDS
+constraints              = all-bonds ; Replace bonds with constraints to enable 2 fs time step
+
+; FREE ENERGY
+free-energy             =  yes ; This is a free energy calculation
+init-lambda             =  1.00
+sc-alpha                =  1.51 ; Use soft-cores to interpolate non-bonded parameters of states
